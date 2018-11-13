@@ -13,46 +13,39 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements PokeService.PokemonListener {
     private Button buttonSincronizar;
     private TextView textoPokemon;
+    private PokeService pokeService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        pokeService = new PokeService();
         textoPokemon = findViewById(R.id.textoPokemon);
-        textoPokemon.setVisibility(View.GONE);
         buttonSincronizar = findViewById(R.id.buttonSincronizar);
         buttonSincronizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                textoPokemon.setVisibility(View.VISIBLE);
+                pokeService.baixarPokemons(MainActivity.this, MainActivity.this);
             }
         });
-
-        //O código de conexão com a PokeAPI começa aqui
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="https://pokeapi.co/api/v2/pokemon/";
-
-        //Preparar uma requisição para a URL da PokeAPI
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //Exibindo a resposta da PokeAPI na tela
-                        textoPokemon.setText(response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //Caso haja algum problema, exibir mensagem de erro
-                textoPokemon.setText("Ocorreu um erro!");
-            }
-        });
-
-        //Executar a requicição HTTP
-        queue.add(stringRequest);
     }
 
+    @Override
+    public void baixados(List<String> nomesPokemons) {
+        String nomes = "";
+        for (String nome : nomesPokemons){
+            nomes += nome + "\n";
+        }
+        textoPokemon.setText(nomes);
+    }
+
+    @Override
+    public void erro(String erro) {
+        textoPokemon.setText(erro);
+    }
 }
