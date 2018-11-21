@@ -1,6 +1,8 @@
 package com.company.pokelist;
 
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -15,6 +17,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PokeService {
 
@@ -31,12 +35,12 @@ public class PokeService {
                         try {
                             JSONObject json = new JSONObject(response);
                             JSONArray pokemonsArray = json.getJSONArray("results");
-                            List<String> nomesPokemons = new ArrayList<>();
+                            List<Pokemon> pokemons = new ArrayList<>();
                             for (int i=0; i<pokemonsArray.length(); i++){
                                 JSONObject pokemonJson = pokemonsArray.getJSONObject(i);
-                                nomesPokemons.add(pokemonJson.getString("name"));
+                                pokemons.add(converterJsonParaPokemon(pokemonJson));
                             }
-                            pokemonListener.baixados(nomesPokemons);
+                            pokemonListener.baixados(pokemons);
                         }catch (JSONException e){
                             e.printStackTrace();
                             pokemonListener.erro("Não foi possível verificar a resposta do servidor");
@@ -53,8 +57,27 @@ public class PokeService {
         queue.add(stringRequest);
     }
 
+    private Pokemon converterJsonParaPokemon(JSONObject pokemonJson) throws JSONException{
+        Pokemon pokemon = new Pokemon();
+        String url = pokemonJson.getString("url");
+        String nome = pokemonJson.getString("name");
+        int id = getIdPokemon(url);
+        String urlImagem = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"+id+".png";
+        pokemon.setNome(nome);
+        pokemon.setUrl(url);
+        pokemon.setId(id);
+        pokemon.setImagem_url(urlImagem);
+        return pokemon;
+    }
+
+    private int getIdPokemon(String url){
+        Uri uri = Uri.parse(url);
+        String id = uri.getLastPathSegment();
+        return Integer.parseInt(id);
+    }
+
     public interface PokemonListener{
-        void baixados(List<String> nomesPokemons);
+        void baixados(List<Pokemon> pokemons);
         void erro(String erro);
     }
 
