@@ -15,6 +15,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.drawee.backends.pipeline.Fresco;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements PokeService.Pokem
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Fresco.initialize(this);
         pokeService = new PokeService();
         recyclerView = findViewById(R.id.recyclerViewPokemons);
         LinearLayoutManager layoutManager = new LinearLayoutManager(

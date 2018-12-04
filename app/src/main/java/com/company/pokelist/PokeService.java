@@ -38,7 +38,8 @@ public class PokeService {
                             List<Pokemon> pokemons = new ArrayList<>();
                             for (int i=0; i<pokemonsArray.length(); i++){
                                 JSONObject pokemonJson = pokemonsArray.getJSONObject(i);
-                                pokemons.add(converterJsonParaPokemon(pokemonJson));
+                                Pokemon pokemon = converterJsonParaPokemon(pokemonJson);
+                                pokemons.add(pokemon);
                             }
                             pokemonListener.baixados(pokemons);
                         }catch (JSONException e){
