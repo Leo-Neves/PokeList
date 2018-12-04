@@ -54,11 +54,17 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         //Neste método vamos trabalhar com os objetos Pokemon e exibir seu conteudo
         // em cada elemento visual da lista
         Pokemon pokemon = pokemons.get(i);
+
+        //Exibir nome dos Pokemons:
         String nome = pokemon.getNome();
         nome = nome.substring(0, 1).toUpperCase() + nome.substring(1);
         pokemonView.nome.setText(nome);
+
+        //Exibir imagem do Pokemon
         Uri uri = Uri.parse(pokemon.getImagem_url());
         pokemonView.figura.setImageURI(uri);
+
+        //Exibir imagem de Pokemon no fundo e aplicar o filtro de BlurEffect
         ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(uri)
                 .setPostprocessor(new ScalingBlurPostprocessor(10, 5, 20))
                 .build();
@@ -88,49 +94,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         }
     }
 
-    public class ScalingBlurPostprocessor extends BasePostprocessor {
 
-        private final Paint mPaint = new Paint();
-        private final int mIterations;
-        private final int mBlurRadius;
-        /**
-         * A scale ration of 4 means that we reduce the total number of pixels to process by factor 16.
-         */
-        private final int mScaleRatio;
-
-        public ScalingBlurPostprocessor(int iterations, int blurRadius, int scaleRatio) {
-            Preconditions.checkArgument(scaleRatio > 0);
-
-            mIterations = iterations;
-            mBlurRadius = blurRadius;
-            mScaleRatio = scaleRatio;
-        }
-
-        @Override
-        public CloseableReference<Bitmap> process(
-                Bitmap sourceBitmap,
-                PlatformBitmapFactory bitmapFactory) {
-            final CloseableReference<Bitmap> bitmapRef =
-                    bitmapFactory.createBitmap(
-                            sourceBitmap.getWidth() / mScaleRatio, sourceBitmap.getHeight() / mScaleRatio);
-
-            try {
-                final Bitmap destBitmap = bitmapRef.get();
-                final Canvas canvas = new Canvas(destBitmap);
-
-                canvas.drawBitmap(
-                        sourceBitmap,
-                        null,
-                        new Rect(-destBitmap.getWidth(), -destBitmap.getHeight(), destBitmap.getWidth()*2, destBitmap.getHeight()*2),
-                        mPaint);
-
-                NativeBlurFilter.iterativeBoxBlur(
-                        destBitmap, mIterations, Math.max(1, mBlurRadius / mScaleRatio));
-                return CloseableReference.cloneOrNull(bitmapRef);
-            } finally {
-                CloseableReference.closeSafely(bitmapRef);
-            }
-        }
-    }
 
 }
