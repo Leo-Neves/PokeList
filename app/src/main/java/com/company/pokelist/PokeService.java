@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.company.pokelist.utils.AssetsUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,10 +22,44 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PokeService {
+    private Context context;
+    private RequestQueue queue;
 
-    public void baixarPokemons(Context context, final PokemonListener pokemonListener){
-        //O código de conexão com a PokeAPI começa aqui
-        RequestQueue queue = Volley.newRequestQueue(context);
+    public PokeService(Context context){
+        this.context = context;
+        queue = Volley.newRequestQueue(context);
+    }
+
+    public void baixarDetalhesDePokemon(final Pokemon pokemon, final PokemonDetalhesListener pokemonDetalhesListener){
+        String url = pokemon.getUrl();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try{
+                    JSONObject json = new JSONObject(response);
+                    pokemon.setOrdem(json.optInt("order"));
+                    pokemon.setPeso(json.optInt("weight") / 10.0);
+                    pokemon.setAltura(json.optInt("height") * 10);
+                    pokemon.setBase_exp(json.optInt("base_experience"));
+                    pokemon.setTipos(obterTiposDoPokemon(json));
+                    pokemon.setOutras_imagens_url(obterImagensDoPokemon(json));
+                    pokemonDetalhesListener.baixado(pokemon);
+                }catch (JSONException e){
+                    e.printStackTrace();
+                    pokemonDetalhesListener.erro("Não foi possível obter dados do "+pokemon.getNome());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pokemonDetalhesListener.erro("Não foi possível obter dados do "+pokemon.getNome());
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    public void baixarPokemons(final PokemonListener pokemonListener){
         String url ="https://pokeapi.co/api/v2/pokemon/";
 
         //Preparar uma requisição para a URL da PokeAPI
@@ -71,6 +106,41 @@ public class PokeService {
         return pokemon;
     }
 
+    private List<String> obterTiposDoPokemon(JSONObject json) throws JSONException{
+        JSONObject tiposPortugues = AssetsUtils.getJSONObjectFromAssets(context, "types.json");
+        List<String> tipos = new ArrayList<>();
+        JSONArray tiposJson = json.getJSONArray("types");
+        for (int i=0; i<tiposJson.length();i++){
+            JSONObject tipoJson = tiposJson.getJSONObject(i);
+            String tipoIngles = tipoJson.getJSONObject("type").optString("name");
+            String tipoPortugues = tiposPortugues.optString(tipoIngles, tipoIngles);
+            tipos.add(tipoPortugues);
+        }
+        return tipos;
+    }
+
+    private List<String> obterImagensDoPokemon(JSONObject json) throws JSONException{
+        List<String> imagensUrl = new ArrayList<>();
+        JSONObject sprites = json.getJSONObject("sprites");
+        if (sprites.optString("back_default", null) != null)
+            imagensUrl.add(sprites.getString("back_default"));
+        if (sprites.optString("back_female", null) != null)
+            imagensUrl.add(sprites.getString("back_female"));
+        if (sprites.optString("back_shiny", null) != null)
+            imagensUrl.add(sprites.getString("back_shiny"));
+        if (sprites.optString("back_shiny_female", null) != null)
+            imagensUrl.add(sprites.getString("back_shiny_female"));
+        if (sprites.optString("front_default", null) != null)
+            imagensUrl.add(sprites.getString("front_default"));
+        if (sprites.optString("front_female", null) != null)
+            imagensUrl.add(sprites.getString("front_female"));
+        if (sprites.optString("front_shiny", null) != null)
+            imagensUrl.add(sprites.getString("front_shiny"));
+        if (sprites.optString("front_shiny_female", null) != null)
+            imagensUrl.add(sprites.getString("front_shiny_female"));
+        return imagensUrl;
+    }
+
     private int getIdPokemon(String url){
         Uri uri = Uri.parse(url);
         String id = uri.getLastPathSegment();
@@ -79,6 +149,11 @@ public class PokeService {
 
     public interface PokemonListener{
         void baixados(List<Pokemon> pokemons);
+        void erro(String erro);
+    }
+
+    public interface PokemonDetalhesListener{
+        void baixado(Pokemon pokemon);
         void erro(String erro);
     }
 

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dialogNome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nome"
+        android:textSize="36sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/dialogOrdem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="#1"
+        android:textSize="28sp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/dialogAltura"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:text="Altura: 23"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/dialogPeso"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Peso: 23"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/dialogTipos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipos: Gelo, Fogo"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/dialogBaseXp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Base Exp.: 64"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/dialogOutrasImagens"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Outras Imagens:"
+        android:textSize="25sp" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/dialogImagens"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+</LinearLayout>

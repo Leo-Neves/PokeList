@@ -1,4 +1,4 @@
-package com.company.pokelist;
+package com.company.pokelist.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
